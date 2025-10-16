@@ -1,5 +1,5 @@
 {
-	"name": "@resonatehq/resonate-faas-gcp-ts",
+	"name": "@resonatehq/gcp",
 	"version": "0.1.0",
 	"description": "Resonate FaaS handler for Google Cloud Functions (TypeScript)",
 	"main": "dist/index.js",
