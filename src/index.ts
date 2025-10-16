@@ -92,9 +92,6 @@ export class Resonate {
 					});
 				}
 
-				const pid = `pid-${Math.random().toString(36).substring(7)}`;
-				const ttl = 30 * 1000; // 30s
-
 				const encoder = new JsonEncoder();
 				const network = new HttpNetwork({
 					url: body.href.base,
@@ -102,23 +99,18 @@ export class Resonate {
 					headers: {},
 				});
 
-				const handler = new Handler(network, encoder);
-				const heartbeat = new NoopHeartbeat();
-				const clock = new WallClock();
-				const dependencies = new Map();
-
 				const resonateInner = new ResonateInner({
 					unicast: url,
 					anycastPreference: url,
 					anycastNoPreference: url,
-					pid,
-					ttl,
-					clock,
+					pid: `pid-${Math.random().toString(36).substring(7)}`,
+					ttl: 30 * 1000, // 30s
+					clock: new WallClock(),
 					network,
-					handler,
+					handler: new Handler(network, encoder),
 					registry: this.registry,
-					heartbeat,
-					dependencies,
+					heartbeat: new NoopHeartbeat(),
+					dependencies: new Map(),
 				});
 
 				const task: Task = { kind: "unclaimed", task: body.task };
