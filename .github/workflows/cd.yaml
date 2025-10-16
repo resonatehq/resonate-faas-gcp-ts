@@ -23,3 +23,8 @@ jobs:
 
       - name: build library
         run: bun run build
+
+      - name: publish to npm
+        run: bun publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
