@@ -59,40 +59,37 @@ export class Resonate {
 		return async (req: Request, res: Response) => {
 			try {
 				if (req.method !== "POST") {
-					res.status(405).json({ error: "Method not allowed. Use POST." });
-					return;
+					return res
+						.status(405)
+						.json({ error: "Method not allowed. Use POST." });
 				}
 
 				const proto = req.get("x-forwarded-proto") || req.protocol;
 				const host = req.get("host");
 
 				if (!proto || !host) {
-					res.status(400).json({
+					return res.status(400).json({
 						error: "Missing required headers: x-forwarded-proto or host.",
 					});
-					return;
 				}
 
 				const url = `${proto}://${host}${req.originalUrl || ""}`;
 
 				if (!req.body) {
-					res.status(400).json({ error: "Request body missing." });
-					return;
+					return res.status(400).json({ error: "Request body missing." });
 				}
 
-				const body =
-					typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+				const body = req.body;
 
 				if (
 					!body ||
 					!(body.type === "invoke" || body.type === "resume") ||
 					!body.task
 				) {
-					res.status(400).json({
+					return res.status(400).json({
 						error:
 							'Request body must contain "type" and "task" for Resonate invocation.',
 					});
-					return;
 				}
 
 				const pid = `pid-${Math.random().toString(36).substring(7)}`;
@@ -128,28 +125,26 @@ export class Resonate {
 
 				resonateInner.process(task, (error, status) => {
 					if (error || !status) {
-						res.status(500).json({
+						return res.status(500).json({
 							error: "Task processing failed",
 							details: { error, status },
 						});
-						return;
 					}
 
 					if (status.kind === "completed") {
-						res.status(200).json({
+						return res.status(200).json({
 							status: "completed",
 							result: status.promise.value,
 							requestUrl: url,
 						});
-					} else {
-						res.status(200).json({
-							status: "suspended",
-							requestUrl: url,
-						});
 					}
+					return res.status(200).json({
+						status: "suspended",
+						requestUrl: url,
+					});
 				});
 			} catch (error) {
-				res.status(500).json({
+				return res.status(500).json({
 					error: `Handler failed: ${error}`,
 				});
 			}
