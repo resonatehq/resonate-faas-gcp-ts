@@ -128,7 +128,6 @@ export class Resonate {
 
 				resonateInner.process(task, (error, status) => {
 					if (error || !status) {
-						console.error("❌ Task processing failed:", { error, status });
 						res.status(500).json({
 							error: "Task processing failed",
 							details: { error, status },
@@ -150,7 +149,6 @@ export class Resonate {
 					}
 				});
 			} catch (error) {
-				console.error("Handler error:", error);
 				res.status(500).json({
 					error: `Handler failed: ${error}`,
 				});
