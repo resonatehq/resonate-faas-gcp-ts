@@ -116,8 +116,9 @@ Each `yield` is a checkpoint: Resonate persists the state via the **Resonate Ser
 
 ## 🧩 Related Packages
 
-| Platform        | Package                                                    |
-| --------------- | ---------------------------------------------------------- |
-| Google Cloud    | `@resonatehq/gcp`                                          |
+| Platform     | Package           |
+| ------------ | ----------------- |
+| AWS   | `@resonatehq/aws` |
+| Google Cloud | `@resonatehq/gcp` |
 
 ---
