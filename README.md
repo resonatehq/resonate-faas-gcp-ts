@@ -8,10 +8,10 @@ This package enables **Google Cloud Platform (GCP)** developers to build resilie
 
 ## ✨ Features
 
-* 🧠 **Procedural orchestration** — write workflows as generator functions.
-* ☁️ **Serverless-native** — deploy to Cloud Functions or Cloud Run.
-* 🔁 **Durable execution** — Resonate Server manages state, retries, and continuation.
-* 📡 **RPC between workflows** — simple function-to-function calls over HTTP.
+- 🧠 **Procedural orchestration** — write workflows as generator functions.
+- ☁️ **Serverless-native** — deploy to Cloud Functions or Cloud Run.
+- 🔁 **Durable execution** — Resonate Server manages state, retries, and continuation.
+- 📡 **RPC between workflows** — simple function-to-function calls over HTTP.
 
 ---
 
@@ -51,10 +51,10 @@ import { type Context, Resonate } from "@resonatehq/gcp";
 const resonate = new Resonate();
 
 function* factorial(ctx: Context, n: number): Generator<any, number, any> {
-	if (n <= 1) {
-		return 1;
-	}
-	return n * (yield ctx.rpc("factorial", n - 1));
+  if (n <= 1) {
+    return 1;
+  }
+  return n * (yield ctx.rpc("factorial", n - 1));
 }
 
 resonate.register(factorial);
@@ -105,12 +105,13 @@ Each `yield` is a checkpoint: Resonate persists the state via the **Resonate Ser
 
 **Key Concepts:**
 
-| Concept                  | Description                                               |
-| ------------------------ | --------------------------------------------------------- |
-| `Context`                | The execution context for a workflow.                     |
-| `ctx.rpc()`              | Call another registered workflow (RPC-style).             |
-| `resonate.register()`    | Register functions for orchestration.                     |
-| `resonate.handlerHttp()` | Expose an HTTP endpoint for Cloud Functions or Cloud Run. |
+| Concept                      | Description                                                                                                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **`Context`**                | The execution context for a workflow.                                                |
+| **`ctx.rpc()`**              | Invokes another registered workflow _remotely_ (via HTTP). The current function suspends and exits; Resonate resumes execution once the remote workflow completes. |
+| **`ctx.run()`**              | Executes another function (no need to be registered) locally within the same function. The workflow continues immediately without suspension or remote calls.                                     |
+| **`resonate.register()`**    | Register functions for orchestration.                                                                |
+| **`resonate.httpHandler()`** | Expose an HTTP endpoint for Cloud Functions or Cloud Run.                                                  |
 
 ---
 
@@ -118,7 +119,7 @@ Each `yield` is a checkpoint: Resonate persists the state via the **Resonate Ser
 
 | Platform     | Package           |
 | ------------ | ----------------- |
-| AWS   | `@resonatehq/aws` |
+| AWS          | `@resonatehq/aws` |
 | Google Cloud | `@resonatehq/gcp` |
 
 ---
