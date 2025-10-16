@@ -27,7 +27,7 @@
 		"typescript": "^5"
 	},
 	"dependencies": {
-		"@google-cloud/functions-framework": "^3.4.2",
-		"@resonatehq/sdk": "^0.8.3"
+		"@google-cloud/functions-framework": ">=3.4.2 <4.0.0",
+		"@resonatehq/sdk": ">=0.8.3 <1.0.0"
 	}
 }
