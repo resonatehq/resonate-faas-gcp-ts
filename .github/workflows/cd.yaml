@@ -16,16 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version: 1.3.0
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
 
-      - name: install
-        run: bun install
-
-      - name: build library
-        run: bun run build
-
-      - name: publish to npm
-        run: bun publish
+      # Ensure npm 11.5.1 or later is installed
+      - name: Update npm
+        run: npm install -g npm@latest
+      - run: npm run build
+      - run: npm publish
