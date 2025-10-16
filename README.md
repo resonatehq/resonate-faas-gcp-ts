@@ -1,15 +1,24 @@
-# resonate-faas-gcp-ts
+# @resonatehq/gcp
 
-To install dependencies:
+Resonate empowering serverless and event-driven architectures written as procedural code.
 
-```bash
-bun install
+```ts
+import { type Context, Resonate } from "@resonatehq/gcp";
+
+const resonate = new Resonate();
+
+function* factorial(ctx: Context, n: number): Generator<any, number, any> {
+	if (n <= 1) {
+		return 1;
+	}
+	return n * (yield ctx.rpc("factorial", n - 1));
+}
+
+resonate.register(factorial);
+
+export const handler = resonate.handlerHttp();
 ```
 
-To run:
-
 ```bash
-bun run index.ts
+resonate invoke --func factorial --arg 10 --target https://<url-for-your-gcp-function>.com
 ```
-
-This project was created using `bun init` in bun v1.2.17. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
