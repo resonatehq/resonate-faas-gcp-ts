@@ -4,7 +4,6 @@ import type {
 	Response,
 } from "@google-cloud/functions-framework";
 
-import { Context } from "@resonatehq/sdk";
 import { WallClock } from "@resonatehq/sdk/dist/src/clock";
 import { HttpNetwork } from "@resonatehq/sdk/dist/src/core";
 import { JsonEncoder } from "@resonatehq/sdk/dist/src/encoder";
@@ -16,8 +15,6 @@ import {
 	type Task,
 } from "@resonatehq/sdk/dist/src/resonate-inner";
 import type { Func } from "@resonatehq/sdk/dist/src/types";
-
-export { Context };
 
 export class Resonate {
 	private registry = new Registry();
