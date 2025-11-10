@@ -14,12 +14,22 @@ import {
 	type Task,
 	WallClock,
 } from "@resonatehq/sdk";
+import {
+	type Encryptor,
+	NoopEncryptor,
+} from "@resonatehq/sdk/dist/src/encryptor";
 
 export class Resonate {
 	private registry = new Registry();
 	private verbose: boolean;
-	constructor({ verbose = false }: { verbose?: boolean } = {}) {
+	private encryptor: Encryptor;
+
+	constructor({
+		verbose = false,
+		encryptor = undefined,
+	}: { verbose?: boolean; encryptor?: Encryptor } = {}) {
 		this.verbose = verbose;
+		this.encryptor = encryptor ?? new NoopEncryptor();
 	}
 	public register<F extends Func>(
 		name: string,
@@ -104,7 +114,7 @@ export class Resonate {
 					anycastPreference: url,
 					clock: new WallClock(),
 					dependencies: new Map(),
-					handler: new Handler(network, encoder),
+					handler: new Handler(network, encoder, this.encryptor),
 					heartbeat: new NoopHeartbeat(),
 					network,
 					pid: `pid-${Math.random().toString(36).substring(7)}`,
