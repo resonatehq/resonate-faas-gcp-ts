@@ -1,35 +1,35 @@
 {
-  "name": "@resonatehq/gcp",
-  "version": "0.1.5",
-  "description": "Resonate FaaS handler for Google Cloud Functions (TypeScript)",
-  "repository": {
-    "url": "https://github.com/resonatehq/resonate-faas-gcp-ts"
-  },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "keywords": [
-    "resonate",
-    "faas",
-    "google-cloud",
-    "google-cloud-functions",
-    "durable-execution"
-  ],
-  "scripts": {
-    "build": "tsc",
-    "check": "npx @biomejs/biome check",
-    "fmt": "npx @biomejs/biome check --write",
-    "type-check": "npx tsc --noEmit"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.2.6",
-    "@types/bun": "latest",
-    "open": "^10.2.0",
-    "@google-cloud/functions-framework": "^3.5.1"
-  },
-  "peerDependencies": {
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@resonatehq/sdk": "^0.8.6"
-  }
+	"name": "@resonatehq/gcp",
+	"version": "0.1.5",
+	"description": "Resonate FaaS handler for Google Cloud Functions (TypeScript)",
+	"repository": {
+		"url": "https://github.com/resonatehq/resonate-faas-gcp-ts"
+	},
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"keywords": [
+		"resonate",
+		"faas",
+		"google-cloud",
+		"google-cloud-functions",
+		"durable-execution"
+	],
+	"scripts": {
+		"build": "tsc",
+		"check": "npx @biomejs/biome check",
+		"fmt": "npx @biomejs/biome check --write",
+		"type-check": "npx tsc --noEmit"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.6",
+		"@types/bun": "latest",
+		"open": "^10.2.0",
+		"@google-cloud/functions-framework": "^3.5.1"
+	},
+	"peerDependencies": {
+		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"@resonatehq/sdk": "^0.8.6"
+	}
 }
