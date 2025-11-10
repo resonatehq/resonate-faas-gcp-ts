@@ -17,7 +17,8 @@
 	"scripts": {
 		"build": "tsc",
 		"check": "npx @biomejs/biome check",
-		"fmt": "npx @biomejs/biome check --write"
+		"fmt": "npx @biomejs/biome check --write",
+		"type-check": "npx tsc --noEmit"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.6",
@@ -29,6 +30,6 @@
 		"typescript": "^5.9.3"
 	},
 	"dependencies": {
-		"@resonatehq/sdk": "^0.8.4"
+		"@resonatehq/sdk": "^0.8.6"
 	}
 }
