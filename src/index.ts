@@ -18,6 +18,7 @@ import {
 	type Encryptor,
 	NoopEncryptor,
 } from "@resonatehq/sdk/dist/src/encryptor";
+import { Buffer } from "node:buffer";
 
 export class Resonate {
 	private registry = new Registry();
@@ -102,8 +103,14 @@ export class Resonate {
 				}
 
 				const encoder = new JsonEncoder();
+				const username = process.env.RESONATE_USERNAME;
+				const password = process.env.RESONATE_PASSWORD;
+				const basicAuthHeader =
+					username && password
+						? `Basic ${Buffer.from(`${username}:${password}`, "utf8").toString("base64")}`
+						: undefined;
 				const network = new HttpNetwork({
-					headers: {},
+					headers: basicAuthHeader ? { Authorization: basicAuthHeader } : {},
 					timeout: 60 * 1000, // 60s
 					url: body.href.base,
 					verbose: this.verbose,
