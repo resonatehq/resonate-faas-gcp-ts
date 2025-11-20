@@ -1,39 +1,33 @@
 # @resonatehq/gcp
 
-**Resonate** — empowering **serverless** and **event-driven** architectures written as **procedural code**.
+`@resonatehq/gcp` is the official binding to deploy Distributed Async Await, Resonate's durable execution framework, to [Google Cloud Functions](https://cloud.google.com/functions). Run long-running, stateful applications on short-lived, stateless infrastructure.
 
-This package enables **Google Cloud Platform (GCP)** developers to build resilient, event-driven workflows using plain JavaScript or TypeScript — powered by the **Resonate Server**, which orchestrates execution, state, and communication across functions.
+**Examples:**
 
----
+- [Durable Countdown]()
+- [Durable, Recursive Research Agent]()
 
-## ✨ Features
+## Architecture
 
-- 🧠 **Procedural orchestration** — write workflows as generator functions.
-- ☁️ **Serverless-native** — deploy to Cloud Functions or Cloud Run.
-- 🔁 **Durable execution** — Resonate Server manages state, retries, and continuation.
-- 📡 **RPC between workflows** — simple function-to-function calls over HTTP.
+When the Durable Function awaits a pending Durable Promise (for example on `yield* context.rpc()` or `context.sleep`), the Google Function **terminates**. When the Durable Promise completes, the Resonate Server resumes the Durable Function by invoking the Google Function again.
 
----
 
-## 🏗️ Architecture
-
-Resonate applications are split into **two components**:
-
-1. **Resonate Server** – coordinates execution, maintains workflow state, and handles retries.
-2. **Function Workers** – your cloud functions (like GCP Cloud Functions) that perform the actual logic.
-
-The GCP SDK (`@resonatehq/gcp`) connects these workers to the Resonate Server, enabling distributed orchestration without needing a centralized monolith.
-
-```text
-+-----------------+        +-------------------------+
-|   GCP Function  |  --->  |  Resonate Server (Core) |
-|  (factorial)    | <---   |  State + Coordination   |
-+-----------------+        +-------------------------+
+```ts
+function* factorial(context: Context, n: number): Generator {
+  if (n <= 0)  { 
+    return 1;
+  }
+  else {
+    return n * (yield* context.rpc(factorial, n - 1));
+  }
+}
 ```
 
----
+Illustration of executing `factorial(2)` on Google Cloud Functions:
 
-## 🚀 Quick Start
+![Resonate on Serverless](./public/resonate.svg)
+
+## Quick Start
 
 ### 1. Install
 
@@ -41,9 +35,7 @@ The GCP SDK (`@resonatehq/gcp`) connects these workers to the Resonate Server, e
 npm install @resonatehq/gcp
 ```
 
----
-
-### 2. Example: Recursive Workflow
+### 2. Example: Factorial
 
 ```ts
 import { type Context, Resonate } from "@resonatehq/gcp";
@@ -61,8 +53,6 @@ resonate.register(factorial);
 
 export const handler = resonate.handlerHttp();
 ```
-
----
 
 ### 3. Deploy to GCP
 
@@ -84,9 +74,9 @@ Once deployed, you can trigger workflows using the [Resonate CLI](https://github
 
 ```bash
 resonate invoke \
-  --server https://<resonate-server-url>.com
   --func factorial \
   --arg 10 \
+  --server https://<resonate-server-url>.com \
   --target https://<url-for-your-gcp-function>.com
 ```
 
@@ -95,31 +85,3 @@ Expected output:
 ```
 3628800
 ```
-
----
-
-## 🧠 How It Works
-
-Resonate uses **generator functions** to represent workflows.
-Each `yield` is a checkpoint: Resonate persists the state via the **Resonate Server** and resumes execution when the dependency (RPC, event, etc.) completes.
-
-**Key Concepts:**
-
-| Concept                      | Description                                                                                                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **`Context`**                | The execution context for a workflow.                                                |
-| **`ctx.rpc()`**              | Invokes another registered workflow _remotely_ (via HTTP). The current function suspends and exits; Resonate resumes execution once the remote workflow completes. |
-| **`ctx.run()`**              | Executes another function (no need to be registered) locally within the same function. The workflow continues immediately without suspension or remote calls.                                     |
-| **`resonate.register()`**    | Register functions for orchestration.                                                                |
-| **`resonate.httpHandler()`** | Expose an HTTP endpoint for Cloud Functions or Cloud Run.                                                  |
-
----
-
-## 🧩 Related Packages
-
-| Platform     | Package           |
-| ------------ | ----------------- |
-| AWS          | `@resonatehq/aws` |
-| Google Cloud | `@resonatehq/gcp` |
-
----

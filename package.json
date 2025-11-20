@@ -9,10 +9,12 @@
 	"types": "dist/index.d.ts",
 	"keywords": [
 		"resonate",
+		"durable-execution"
+		"distributed-async-await"
 		"faas",
+		"serverless",
 		"google-cloud",
 		"google-cloud-functions",
-		"durable-execution"
 	],
 	"scripts": {
 		"build": "tsc",
