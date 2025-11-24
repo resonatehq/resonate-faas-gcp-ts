@@ -29,59 +29,17 @@ Illustration of executing `factorial(2)` on Google Cloud Functions:
 
 ## Quick Start
 
-### 1. Install
-
 ```bash
 npm install @resonatehq/gcp
 ```
 
-### 2. Example: Factorial
-
-```ts
-import { type Context, Resonate } from "@resonatehq/gcp";
-
-const resonate = new Resonate();
-
-function* factorial(ctx: Context, n: number): Generator<any, number, any> {
-  if (n <= 1) {
-    return 1;
-  }
-  return n * (yield ctx.rpc("factorial", n - 1));
-}
-
-resonate.register(factorial);
-
-export const handler = resonate.handlerHttp();
-```
-
-### 3. Deploy to GCP
-
-Deploy your function using Google Cloud Functions or Cloud Run:
+## Quick Start
 
 ```bash
-gcloud functions deploy factorial \
-  --runtime=nodejs22 \
-  --entry-point=handler \
-  --trigger-http \
-  --allow-unauthenticated
+npm install @resonatehq/aws
 ```
 
----
+See [Google Cloud Functions documentation](https://cloud.google.com/functions/docs) to learn how to develop and deploy Google Cloud Functions and see Resonate's Google Cloud Functions for a step by step tutorial:
 
-### 4. Invoke via CLI
-
-Once deployed, you can trigger workflows using the [Resonate CLI](https://github.com/resonatehq/cli):
-
-```bash
-resonate invoke \
-  --func factorial \
-  --arg 10 \
-  --server https://<resonate-server-url>.com \
-  --target https://<url-for-your-gcp-function>.com
-```
-
-Expected output:
-
-```
-3628800
-```
+- [Durable Countdown](https://github.com/resonatehq-examples/example-countdown-gcp-ts)
+- [Durable, Recursive Research Agent](https://github.com/resonatehq-examples/example-openai-deep-research-agent-gcp-ts)
