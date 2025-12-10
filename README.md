@@ -4,13 +4,12 @@
 
 **Examples:**
 
-- [Durable Countdown]()
-- [Durable, Recursive Research Agent]()
+- [Durable Countdown](https://github.com/resonatehq-examples/example-countdown-gcp-ts)
+- [Durable, Recursive Research Agent](https://github.com/resonatehq-examples/example-openai-deep-research-agent-gcp-ts)
 
 ## Architecture
 
 When the Durable Function awaits a pending Durable Promise (for example on `yield* context.rpc()` or `context.sleep`), the Google Function **terminates**. When the Durable Promise completes, the Resonate Server resumes the Durable Function by invoking the Google Function again.
-
 
 ```ts
 function* factorial(context: Context, n: number): Generator {
@@ -29,17 +28,21 @@ Illustration of executing `factorial(2)` on Google Cloud Functions:
 
 ## Quick Start
 
+To use this shim, import Resonate from the shim instead of the SDK.
+
 ```bash
 npm install @resonatehq/gcp
 ```
 
-## Quick Start
+```ts
+import { Resonate } from "@resonatehq/gcp";
+import { yourWorklow } from "./yourWorkflow";
 
-```bash
-npm install @resonatehq/aws
+const resonate = new Resonate();
+
+resonate.register("workflow", yourWorkflow);
+
+export const handler = resonate.handlerHttp();
 ```
 
 See [Google Cloud Functions documentation](https://cloud.google.com/functions/docs) to learn how to develop and deploy Google Cloud Functions and see Resonate's Google Cloud Functions for a step by step tutorial:
-
-- [Durable Countdown](https://github.com/resonatehq-examples/example-countdown-gcp-ts)
-- [Durable, Recursive Research Agent](https://github.com/resonatehq-examples/example-openai-deep-research-agent-gcp-ts)
