@@ -28,7 +28,7 @@ Illustration of executing `factorial(2)` on Google Cloud Functions:
 
 ## Quick Start
 
-To use this shim, import Resonate from the shim instead of the SDK.
+To use this binding/shim, import Resonate from the shim instead of the SDK.
 
 ```bash
 npm install @resonatehq/gcp
