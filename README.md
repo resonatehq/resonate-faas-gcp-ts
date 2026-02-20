@@ -1,45 +1,52 @@
 # @resonatehq/gcp
 
-`@resonatehq/gcp` is the official binding to deploy Distributed Async Await, Resonate's durable execution framework, to [Google Cloud Functions](https://cloud.google.com/functions). Run long-running, stateful applications on short-lived, stateless infrastructure.
+`@resonatehq/gcp` is the official binding to run [Resonate](https://github.com/resonatehq/resonate) durable execution workers on [Google Cloud Functions](https://cloud.google.com/functions). Write long-running, stateful applications on short-lived, stateless serverless infrastructure.
 
-**Examples:**
-
-- [Durable Countdown]()
-- [Durable, Recursive Research Agent]()
-
-## Architecture
-
-When the Durable Function awaits a pending Durable Promise (for example on `yield* context.rpc()` or `context.sleep`), the Google Function **terminates**. When the Durable Promise completes, the Resonate Server resumes the Durable Function by invoking the Google Function again.
-
-
-```ts
-function* factorial(context: Context, n: number): Generator {
-  if (n <= 0)  { 
-    return 1;
-  }
-  else {
-    return n * (yield* context.rpc(factorial, n - 1));
-  }
-}
-```
-
-Illustration of executing `factorial(2)` on Google Cloud Functions:
-
-![Resonate on Serverless](./public/resonate.svg)
-
-## Quick Start
+## Installation
 
 ```bash
 npm install @resonatehq/gcp
 ```
 
-## Quick Start
+## How it works
 
-```bash
-npm install @resonatehq/aws
+When a Durable Function suspends (e.g. on `yield* context.rpc()` or `context.sleep()`), the Cloud Function **terminates**. When the Durable Promise completes, the Resonate Server resumes the function by invoking it again — no long-running process required.
+
+![Resonate on Serverless](./public/resonate.svg)
+
+## Usage
+
+Register your functions and export the HTTP handler from your Cloud Function entry point:
+
+```ts
+import { Resonate } from "@resonatehq/gcp";
+import type { Context } from "@resonatehq/gcp";
+
+const resonate = new Resonate();
+
+resonate.register("countdown", function* countdown(ctx: Context, n: number): Generator {
+  if (n <= 0) {
+    console.log("done");
+    return;
+  }
+  console.log(n);
+  yield* ctx.sleep(1000);
+  yield* ctx.rpc(countdown, n - 1);
+});
+
+// Export as a Google Cloud Functions HTTP handler
+export const handler = resonate.httpHandler();
 ```
 
-See [Google Cloud Functions documentation](https://cloud.google.com/functions/docs) to learn how to develop and deploy Google Cloud Functions and see Resonate's Google Cloud Functions for a step by step tutorial:
+Deploy this as a Google Cloud Function with an HTTP trigger. The Resonate Server will call your handler to invoke and resume durable functions.
 
-- [Durable Countdown](https://github.com/resonatehq-examples/example-countdown-gcp-ts)
-- [Durable, Recursive Research Agent](https://github.com/resonatehq-examples/example-openai-deep-research-agent-gcp-ts)
+See the [Google Cloud Functions documentation](https://cloud.google.com/functions/docs) to learn how to develop and deploy Cloud Functions.
+
+## Examples
+
+- [Durable Countdown on Google Cloud Functions](https://github.com/resonatehq-examples/example-countdown-gcp-ts)
+- [Durable Research Agent on Google Cloud Functions](https://github.com/resonatehq-examples/example-openai-deep-research-agent-gcp-ts)
+
+## Documentation
+
+Full documentation: [docs.resonatehq.io](https://docs.resonatehq.io)
