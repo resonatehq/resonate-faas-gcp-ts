@@ -185,12 +185,6 @@ export class Resonate {
               "Cannot determine function URL: missing x-forwarded-proto or host header.",
           });
         }
-        const functionUrl = `${proto}://${host}${req.originalUrl || ""}`;
-
-        const matchFn = (target: string): string => {
-          if (isUrl(target)) return target;
-          return functionUrl;
-        };
 
         const core = new Core({
           pid: this.pid,
@@ -202,7 +196,10 @@ export class Resonate {
           heartbeat: new NoopHeartbeat(),
           dependencies: this.dependencies,
           optsBuilder: new OptionsBuilder({
-            match: matchFn,
+            match: (target: string): string => {
+              if (isUrl(target)) return target;
+              return `${proto}://${host}${req.originalUrl || ""}`;
+            },
             idPrefix: this.idPrefix,
           }),
           logger: this.logger,
