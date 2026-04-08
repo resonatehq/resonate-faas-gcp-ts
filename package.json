@@ -1,6 +1,6 @@
 {
   "name": "@resonatehq/gcp",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Resonate FaaS handler for Google Cloud Functions (TypeScript)",
   "repository": {
     "url": "https://github.com/resonatehq/resonate-faas-gcp-ts"
