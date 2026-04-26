@@ -19,6 +19,9 @@ import {
   Registry,
   WallClock,
 } from "@resonatehq/sdk";
+import { type AuthOptions, resolveAuth } from "./auth.js";
+
+export type { AuthMode, AuthOptions } from "./auth.js";
 
 function isUrl(str: string): boolean {
   try {
@@ -36,7 +39,7 @@ export class Resonate {
   private logger: Logger;
   private pid: string;
   private dependencies: Map<string, any>;
-  private token?: string;
+  private auth: AuthOptions;
   private timeout?: number;
   private ttl: number;
 
@@ -50,8 +53,14 @@ export class Resonate {
    *   (5 minutes). Set this to at least the maximum expected function execution time.
    *   Because serverless functions cannot send async heartbeats, choose a value safely
    *   above your function's configured timeout.
-   * @param options.token - Bearer token for authentication. Passed through to HttpNetwork
-   *   which falls back to `RESONATE_TOKEN` env var.
+   * @param options.auth - Outbound auth mode for calls to the Resonate server.
+   *   Defaults to `{ mode: "auto" }`:
+   *   - `auto`        — mint a Google OIDC ID token for HTTPS server URLs; no auth for HTTP.
+   *   - `none`        — no auth header.
+   *   - `bearer`      — static bearer token (`token` field, then `RESONATE_TOKEN` env var).
+   *   - `oidcIdToken` — always mint a Google OIDC ID token for `audience ?? serverUrl`.
+   * @param options.token - Convenience alias for `auth: { mode: "bearer", token }`.
+   *   Ignored when `auth` is explicitly provided.
    * @param options.timeout - Network request timeout. Passed through to HttpNetwork
    *   which falls back to `RESONATE_TIMEOUT` env var (default: 10s).
    * @param options.verbose - Enables verbose logging (shorthand for `logLevel: "debug"`). Defaults to `false`.
@@ -64,6 +73,7 @@ export class Resonate {
   constructor({
     pid = undefined,
     ttl = 5 * 60 * 1000,
+    auth = undefined,
     token = undefined,
     timeout = undefined,
     verbose = false,
@@ -74,6 +84,7 @@ export class Resonate {
   }: {
     pid?: string;
     ttl?: number;
+    auth?: AuthOptions;
     token?: string;
     timeout?: number;
     verbose?: boolean;
@@ -91,9 +102,19 @@ export class Resonate {
 
     this.registry = new Registry();
     this.dependencies = new Map();
-    this.token = token;
     this.timeout = timeout;
     this.ttl = ttl;
+
+    if (auth !== undefined) {
+      // Explicit auth config always wins.
+      this.auth = auth;
+    } else if (token !== undefined) {
+      // Legacy convenience: token= is sugar for auth: { mode: "bearer", token }.
+      this.auth = { mode: "bearer", token };
+    } else {
+      // Secure default: OIDC ID token for HTTPS targets, nothing for HTTP.
+      this.auth = { mode: "auto" };
+    }
   }
 
   /**
@@ -167,11 +188,16 @@ export class Resonate {
         // RESONATE_URL env var (HttpNetwork handles that fallback internally).
         const resonateServerUrl = body.head.serverUrl;
 
+        // Resolve outbound auth for the call back to the Resonate server.
+        // resonateServerUrl may be undefined; resolveAuth mirrors HttpNetwork's
+        // RESONATE_URL fallback so auto-HTTPS detection still works.
+        const resolved = await resolveAuth(resonateServerUrl, this.auth);
+
         const network = new HttpNetwork({
           url: resonateServerUrl,
           timeout: this.timeout,
-          headers: {},
-          token: this.token,
+          headers: resolved.headers,
+          token: resolved.token,
           logger: this.logger,
         });
 
