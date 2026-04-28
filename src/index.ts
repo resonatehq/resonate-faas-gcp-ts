@@ -71,7 +71,7 @@ export class Resonate {
   constructor({
     pid = undefined,
     ttl = 5 * 60 * 1000,
-    auth = { mode: "none" },
+    auth = { mode: "auto" },
     timeout = undefined,
     verbose = false,
     logLevel = undefined,
