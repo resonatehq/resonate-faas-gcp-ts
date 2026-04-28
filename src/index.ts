@@ -59,8 +59,6 @@ export class Resonate {
    *   - `none`        — no auth header.
    *   - `bearer`      — static bearer token (`token` field, then `RESONATE_TOKEN` env var).
    *   - `oidcIdToken` — always mint a Google OIDC ID token for `audience ?? serverUrl`.
-   * @param options.token - Convenience alias for `auth: { mode: "bearer", token }`.
-   *   Ignored when `auth` is explicitly provided.
    * @param options.timeout - Network request timeout. Passed through to HttpNetwork
    *   which falls back to `RESONATE_TIMEOUT` env var (default: 10s).
    * @param options.verbose - Enables verbose logging (shorthand for `logLevel: "debug"`). Defaults to `false`.
@@ -73,8 +71,7 @@ export class Resonate {
   constructor({
     pid = undefined,
     ttl = 5 * 60 * 1000,
-    auth = undefined,
-    token = undefined,
+    auth = { mode: "auto" },
     timeout = undefined,
     verbose = false,
     logLevel = undefined,
@@ -85,7 +82,6 @@ export class Resonate {
     pid?: string;
     ttl?: number;
     auth?: AuthOptions;
-    token?: string;
     timeout?: number;
     verbose?: boolean;
     logLevel?: LogLevel;
@@ -104,17 +100,7 @@ export class Resonate {
     this.dependencies = new Map();
     this.timeout = timeout;
     this.ttl = ttl;
-
-    if (auth !== undefined) {
-      // Explicit auth config always wins.
-      this.auth = auth;
-    } else if (token !== undefined) {
-      // Legacy convenience: token= is sugar for auth: { mode: "bearer", token }.
-      this.auth = { mode: "bearer", token };
-    } else {
-      // Secure default: OIDC ID token for HTTPS targets, nothing for HTTP.
-      this.auth = { mode: "auto" };
-    }
+    this.auth = auth;
   }
 
   /**
