@@ -40,7 +40,9 @@ function _headersToRecord(h: Headers): Record<string, string> {
   return out;
 }
 
-async function _mintIdTokenHeaders(audience: string): Promise<Record<string, string>> {
+async function _mintIdTokenHeaders(
+  audience: string,
+): Promise<Record<string, string>> {
   const client = await _idTokenClient(audience);
   const h = await client.getRequestHeaders();
   return _headersToRecord(h);
@@ -87,10 +89,13 @@ export async function resolveAuth(
     }
 
     case "auto":
-    default:
       if (effectiveUrl.startsWith("https://")) {
         return { headers: await _mintIdTokenHeaders(effectiveUrl) };
       }
       return { headers: {} };
+
+    default:
+      mode satisfies never;
+      throw new Error(`unknown mode ${mode}`);
   }
 }
